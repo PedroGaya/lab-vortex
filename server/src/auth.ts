@@ -14,6 +14,6 @@ export async function verifyPassword(
 }
 
 export function generateRefCode(setValue?: string): string {
-  if (setValue) return setValue;
+  if (setValue) return setValue.replaceAll(" ", "");
   return Math.random().toString(36).substring(2, 10).toUpperCase();
 }

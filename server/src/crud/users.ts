@@ -1,7 +1,7 @@
 import { prisma } from "../prisma";
 
 import type { User as PrismaUser } from "../../generated/prisma";
-import type { CreateUserParams, User } from "../types/user";
+import type { UserParams, User } from "../types/user";
 import { generateRefCode, hashPassword, verifyPassword } from "../auth";
 
 export async function getUsers(): Promise<User[]> {
@@ -27,10 +27,23 @@ export async function findUserById(id: string): Promise<User> {
   return prismaDataToUser(user);
 }
 
+export async function findUserByRefCode(refCode: string): Promise<User> {
+  const user = await prisma.user.findFirstOrThrow({
+    where: {
+      refCode: refCode,
+    },
+    include: {
+      referrals: false,
+    },
+  });
+
+  return prismaDataToUser(user);
+}
+
 export async function findUserByNameOrEmail(
   nameOrEmail: string
-): Promise<User> {
-  const user = await prisma.user.findFirstOrThrow({
+): Promise<User | null> {
+  const user = await prisma.user.findFirst({
     where: {
       OR: [{ name: nameOrEmail }, { email: nameOrEmail }],
     },
@@ -39,6 +52,7 @@ export async function findUserByNameOrEmail(
     },
   });
 
+  if (!user) return null;
   return prismaDataToUser(user);
 }
 
@@ -57,7 +71,7 @@ export async function verifyUser(identifier: string, password: string) {
   return prismaDataToUser(user);
 }
 
-export async function createUser(data: CreateUserParams): Promise<User> {
+export async function createUser(data: UserParams): Promise<User> {
   const { name, email, pwd } = data;
 
   const hashedPassword = await hashPassword(pwd);
@@ -76,11 +90,11 @@ export async function createUser(data: CreateUserParams): Promise<User> {
 }
 
 export async function deleteUser(userId: string) {
-  const user = await prisma.user.delete({
+  const deleted = await prisma.user.delete({
     where: { id: userId },
   });
 
-  return prismaDataToUser(user);
+  return prismaDataToUser(deleted);
 }
 
 export async function updateRefCount(userId: string, newCount: number) {

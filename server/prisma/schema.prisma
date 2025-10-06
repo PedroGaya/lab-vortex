@@ -22,12 +22,12 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()
 
-  referrals Referral[] @relation("SourceUser")
+  referrals Referral[]
 }
 
 model Referral {
   id              String  @id @default(uuid())
-  from            User    @relation("SourceUser", fields: [fromUserId], references: [id])
+  from            User    @relation(fields: [fromUserId], references: [id], onDelete: Cascade)
   fromUserId      String
   followedThrough Boolean @default(false)
 

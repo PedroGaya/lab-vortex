@@ -8,8 +8,9 @@ import {
   verifyUser,
 } from "../crud/users";
 import { JWT_SECRET } from "../constants";
+import { createReferral } from "../crud/referrals";
 
-export const auth = new Elysia({ prefix: "/auth" })
+export const user = new Elysia({ prefix: "/user" })
   .use(
     jwt({
       name: "jwt",
@@ -21,25 +22,35 @@ export const auth = new Elysia({ prefix: "/auth" })
     })
   )
   .post(
-    "/register",
-    async ({ body, set }) => {
+    "/register/:refCode?",
+    async ({ body, set, params: { refCode } }) => {
       try {
-        const existingName = await findUserByNameOrEmail(body.name);
-        const existingEmail = await findUserByNameOrEmail(body.email);
+        const { referred, ...userParams } = body;
+        const { name, email } = userParams;
+
+        const existingName = await findUserByNameOrEmail(name);
+        const existingEmail = await findUserByNameOrEmail(email);
         if (existingName || existingEmail) {
           set.status = 400;
           return { error: "User with this name or email already exists" };
         }
 
-        const user = await createUser(body);
-
+        const user = await createUser(userParams);
         set.status = 201;
+
+        if (refCode) {
+          const ref = await createReferral({
+            refCode,
+            followedThrough: referred,
+          });
+        }
 
         return {
           message: "User created successfully",
           user,
         };
       } catch (error) {
+        console.log(error);
         set.status = 500;
         return { error: "Internal server error" };
       }
@@ -49,6 +60,7 @@ export const auth = new Elysia({ prefix: "/auth" })
         name: t.String({ minLength: 3 }),
         email: t.String({ format: "email" }),
         pwd: t.String({ minLength: 6 }),
+        referred: t.Boolean(),
       }),
     }
   )
@@ -96,7 +108,7 @@ export const auth = new Elysia({ prefix: "/auth" })
     set.status = 200;
     return { message: "Logout successful" };
   })
-  .delete("/user", async ({ jwt, cookie: { auth }, set }) => {
+  .delete("/", async ({ jwt, cookie: { auth }, set }) => {
     try {
       const token = auth.value;
       if (!token) {
@@ -118,6 +130,7 @@ export const auth = new Elysia({ prefix: "/auth" })
         user: deletedUser,
       };
     } catch (error) {
+      console.log(error);
       set.status = 500;
       return { error: "Internal server error" };
     }

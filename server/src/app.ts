@@ -1,7 +1,7 @@
 import { Elysia } from "elysia";
 import cors from "@elysiajs/cors";
 
-import { auth } from "./routes/auth";
+import { user } from "./routes/user";
 
 import { NODE_ENV } from "./constants";
 
@@ -10,7 +10,7 @@ export const app = new Elysia()
   .onRequest(({ request }) => {
     if (NODE_ENV == "development") console.log(request.method, request.url);
   })
-  .use(auth)
+  .use(user)
   .get("/", () => {
     return "OK";
   });

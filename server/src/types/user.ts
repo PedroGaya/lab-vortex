@@ -6,7 +6,7 @@ export type User = {
   refCount: number;
 };
 
-export type CreateUserParams = {
+export type UserParams = {
   name: string;
   email: string;
   pwd: string;
