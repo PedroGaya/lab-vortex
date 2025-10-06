@@ -1,0 +1,10 @@
+# Server Deps
+
+server/node_modules
+server/.env
+
+# Site Deps
+
+site/node_modules
+site/dist
+site/.env
