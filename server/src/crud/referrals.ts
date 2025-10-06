@@ -25,30 +25,6 @@ export async function createReferral(data: ReferralParams): Promise<Referral> {
   return prismaDataToReferral(ref);
 }
 
-export async function getRefs(): Promise<Referral[]> {
-  const refs = await prisma.referral.findMany();
-
-  return refs.map(prismaDataToReferral);
-}
-
-export async function findReferralById(id: string): Promise<Referral> {
-  const ref = await prisma.referral.findFirstOrThrow({
-    where: {
-      id: id,
-    },
-  });
-
-  return prismaDataToReferral(ref);
-}
-
-export async function deleteReferral(refId: string) {
-  const ref = await prisma.referral.delete({
-    where: { id: refId },
-  });
-
-  return prismaDataToReferral(ref);
-}
-
 function prismaDataToReferral(ref: PrismaReferral): Referral {
   return {
     id: ref.id,
