@@ -1,9 +1,11 @@
-# Server Deps
+# Server
 
 server/node_modules
 server/.env
+server/generated/prisma
 
-# Site Deps
+
+# Site
 
 site/node_modules
 site/dist
