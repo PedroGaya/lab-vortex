@@ -11,8 +11,18 @@ export function Login() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
-  const { user, login } = useAuth();
+  const { user, login, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
+
+  if (authLoading) {
+    return (
+      <div className="auth-container">
+        <div className="auth-form">
+          <h2>Loading...</h2>
+        </div>
+      </div>
+    );
+  }
 
   // Redirect if user is already logged in
   useEffect(() => {

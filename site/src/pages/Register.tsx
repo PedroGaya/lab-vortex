@@ -98,7 +98,10 @@ export function Register() {
         : { ...registerData };
 
       await register(registrationPayload);
-      // Navigation will happen automatically due to the useEffect
+
+      navigate({
+        to: "/login",
+      });
     } catch (error) {
       setErrors({ submit: "Registration failed. Please try again." });
     } finally {

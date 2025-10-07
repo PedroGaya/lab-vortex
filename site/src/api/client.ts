@@ -25,6 +25,7 @@ async function apiCall<T>(
 }
 
 export const api = {
+  checkAuth: () => apiCall("/user/me"),
   register: (data: any) => {
     const { refCode, ...registerData } = data;
     const url = refCode

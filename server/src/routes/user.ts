@@ -5,6 +5,7 @@ import {
   createUser,
   deleteUser,
   findUserByNameOrEmail,
+  findUserByRefCode,
   verifyUser,
 } from "../crud/users";
 import { JWT_SECRET } from "../constants";
@@ -107,6 +108,36 @@ export const user = new Elysia({ prefix: "/user" })
     auth.remove();
     set.status = 200;
     return { message: "Logout successful" };
+  })
+  .get("/me", async ({ set, jwt, cookie: { auth } }) => {
+    try {
+      const token = auth.value;
+      if (!token) {
+        set.status = 401;
+        return { error: "Not authenticated" };
+      }
+
+      const payload = await jwt.verify(auth.value as string);
+      if (!payload) {
+        set.status = 401;
+        return { error: "Failed to verify token" };
+      }
+
+      const user = await findUserByRefCode(payload.refCode);
+      if (!user) {
+        set.status = 401;
+        return { error: "Invalid token" };
+      }
+
+      return {
+        message: "User data retrieved successfuly",
+        user,
+      };
+    } catch (error) {
+      console.log(error);
+      set.status = 500;
+      return { error: "Internal server error" };
+    }
   })
   .delete("/", async ({ jwt, cookie: { auth }, set }) => {
     try {
