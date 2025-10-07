@@ -101,6 +101,9 @@ export function Register() {
 
       navigate({
         to: "/login",
+        search: {
+          registration: "success",
+        },
       });
     } catch (error) {
       setErrors({ submit: "Registration failed. Please try again." });

@@ -1,8 +1,12 @@
 import "./Auth.css";
 
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useAuth } from "../auth/AuthContext";
+
+type LoginSearchParams = {
+  registration?: string;
+};
 
 export function Login() {
   const [formData, setFormData] = useState({
@@ -13,6 +17,9 @@ export function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const { user, login, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
+
+  const search = useSearch({ from: "/login" }) as LoginSearchParams;
+  const registered = search.registration == "success";
 
   if (authLoading) {
     return (
@@ -85,6 +92,12 @@ export function Login() {
       <form className="auth-form" onSubmit={handleSubmit}>
         <h2>Welcome Back</h2>
         <p className="auth-subtitle">Please sign in to your account</p>
+
+        {registered && (
+          <div className="referral-notice">
+            <p>You have successfuly signed up!</p>
+          </div>
+        )}
 
         <div className="form-group">
           <label htmlFor="identifier">Username or Email</label>
