@@ -1,40 +1,67 @@
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import {
-  Outlet,
   RouterProvider,
   createRootRoute,
   createRoute,
   createRouter,
+  redirect,
 } from "@tanstack/react-router";
-
 import "./styles.css";
 
-import App from "./App.tsx";
+import { App } from "./App.tsx";
+import { Login } from "./pages/Login.tsx";
+import { Register } from "./pages/Register.tsx";
+import { Profile } from "./pages/Profile.tsx";
 
 const rootRoute = createRootRoute({
-  component: () => (
-    <>
-      <Outlet />
-    </>
-  ),
+  component: App,
 });
 
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
-  component: App,
+  beforeLoad: () => {
+    // Redirect to login by default
+    throw redirect({ to: "/login" });
+  },
 });
 
-const routeTree = rootRoute.addChildren([indexRoute]);
+const loginRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/login",
+  component: () => <Login />,
+});
+
+const registerRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/register",
+  component: () => <Register />,
+  validateSearch: (search: Record<string, unknown>) => {
+    return {
+      ref: search.ref ? String(search.ref) : undefined,
+    };
+  },
+});
+
+const profileRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/profile",
+  component: () => <Profile />,
+});
+
+const routeTree = rootRoute.addChildren([
+  indexRoute,
+  loginRoute,
+  registerRoute,
+  profileRoute,
+]);
 
 const router = createRouter({
   routeTree,
-  context: {},
-  defaultPreload: "intent",
-  scrollRestoration: true,
-  defaultStructuralSharing: true,
-  defaultPreloadStaleTime: 0,
+  context: {
+    user: undefined,
+  },
 });
 
 declare module "@tanstack/react-router" {

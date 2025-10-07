@@ -22,8 +22,8 @@ export const user = new Elysia({ prefix: "/user" })
     })
   )
   .post(
-    "/register/:refCode?",
-    async ({ body, set, params: { refCode } }) => {
+    "/register",
+    async ({ body, set, query: { ref } }) => {
       try {
         const { referred, ...userParams } = body;
         const { name, email } = userParams;
@@ -38,10 +38,10 @@ export const user = new Elysia({ prefix: "/user" })
         const user = await createUser(userParams);
         set.status = 201;
 
-        if (refCode) {
-          const ref = await createReferral({
-            refCode,
-            followedThrough: referred,
+        if (ref) {
+          await createReferral({
+            refCode: ref,
+            followedThrough: true,
           });
         }
 
@@ -59,7 +59,7 @@ export const user = new Elysia({ prefix: "/user" })
       body: t.Object({
         name: t.String({ minLength: 3 }),
         email: t.String({ format: "email" }),
-        pwd: t.String({ minLength: 6 }),
+        pwd: t.String({ minLength: 8 }),
         referred: t.Boolean(),
       }),
     }

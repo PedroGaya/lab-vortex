@@ -1,13 +1,21 @@
 import "./App.css";
 
-function App() {
+import { Outlet } from "@tanstack/react-router";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AuthProvider } from "./auth/AuthContext";
+
+const queryClient = new QueryClient();
+
+export function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <p>Hello World!</p>
-      </header>
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <div className="app">
+          <main className="main-content">
+            <Outlet />
+          </main>
+        </div>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }
-
-export default App;
