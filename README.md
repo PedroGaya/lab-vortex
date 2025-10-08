@@ -28,8 +28,8 @@ DATABASE_URL="file:./dev.db"
 Depois, configure o banco de dados:
 
 ```bash
-bun install
 cd server
+bun install
 bunx run prisma migrate --dev
 ```
 
