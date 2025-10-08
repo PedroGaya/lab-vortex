@@ -30,7 +30,7 @@ Depois, configure o banco de dados:
 ```bash
 cd server
 bun install
-bunx run prisma migrate --dev
+bunx prisma migrate dev
 ```
 
 Para rodar o site e servidor:
